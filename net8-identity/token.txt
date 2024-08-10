@@ -1,0 +1,103 @@
+var jwtConfig = builder.Configuration.GetSection("jwt");
+
+builder.Services.AddAuthentication(o =>
+    {
+        o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>
+    {
+        options.Events = new JwtBearerEvents()
+        {
+            OnAuthenticationFailed = c =>
+            {
+                c.Response.StatusCode = 500;
+                c.Response.ContentType = "text/plain";
+                if (builder.Environment.IsDevelopment())
+                {
+                    // Debug only, in production do not share exceptions with the remote host.
+                    return c.Response.WriteAsync(c.Exception.ToString());
+                }
+                return c.Response.WriteAsync("An error occurred processing your authentication.");
+            }
+        };
+        
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            SaveSigninToken = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtConfig["ValidIssuer"],
+            ValidAudience = jwtConfig["ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["key"])),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+
+public bool IsTokenValid(string key, string issuer, string token)
+        {
+            var mySecret = Encoding.UTF8.GetBytes(key);
+            var mySecurityKey = new SymmetricSecurityKey(mySecret);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                tokenHandler.ValidateToken(token,
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidIssuer = issuer,
+                        ValidAudience = issuer,
+                        IssuerSigningKey = mySecurityKey,
+                    }, out SecurityToken validatedToken);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+
+
+    builder.Services.Configure<IdentityOptions>(options =>
+{
+      options.Lockout.AllowedForNewUsers = true;
+      options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+      options.Lockout.MaxFailedAccessAttempts = 5;
+      options.Password.RequireDigit = true;
+      options.Password.RequireLowercase = true;
+      options.Password.RequireNonAlphanumeric = true;
+      options.Password.RequireUppercase = true;
+      options.Password.RequiredLength = 6;
+      options.Password.RequiredUniqueChars = 1;
+      options.SignIn.RequireConfirmedAccount = false;
+      options.SignIn.RequireConfirmedEmail = false;
+      options.SignIn.RequireConfirmedPhoneNumber = false;
+      options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+      options.User.RequireUniqueEmail = false;
+});
+
+
+builder.Services.ConfigureApplicationCookie(options =
+{
+    options.Cookie.Domain = "www.yourdomain.com";
+    options.Cookie.Expiration = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = false;
+    options.Cookie.Name = "Identity.Application";
+    options.Cookie.SameSite = SameSiteMode.Unspecified;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+});

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "net8-identity", "net8-identity\net8-identity.csproj", "{B4261F04-E791-435F-B860-713565939F75}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B4261F04-E791-435F-B860-713565939F75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4261F04-E791-435F-B860-713565939F75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4261F04-E791-435F-B860-713565939F75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4261F04-E791-435F-B860-713565939F75}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A67158D-9775-4803-BF56-E3AB07F0274A}
+	EndGlobalSection
+EndGlobal
