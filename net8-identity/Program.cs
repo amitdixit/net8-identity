@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using net8_identity;
+using Scalar.AspNetCore;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,7 +44,23 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    // app.UseSwagger();
+    app.UseSwagger(options =>
+    {
+        options.RouteTemplate = "openapi/{documentName}.json";
+    });
+
+
+    app.MapScalarApiReference(options =>
+    {
+        options
+            .WithTitle("My custom API")
+            .WithTheme(ScalarTheme.Mars)
+            .WithSidebar(true)
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+            .WithPreferredScheme("ApiKey")
+            .WithApiKeyAuthentication(x => x.Token = "my-api-key");
+    }); ;
     // app.UseSwaggerUI();
 }
 
